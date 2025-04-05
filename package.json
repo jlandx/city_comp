@@ -1,0 +1,10 @@
+{
+  "name": "city-comparison-app",
+  "version": "1.0.0",
+  "description": "A web application for comparing city sizes and statistics",
+  "main": "script.js",
+  "scripts": {
+    "start": "python3 -m http.server 3001",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+} 
