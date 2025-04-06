@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>City Comps</title>
-    <base href="/">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css">
     <script>
         // Handle GitHub Pages base URL
         (function() {
             const isGitHubPages = window.location.hostname.includes('github.io');
-            if (isGitHubPages) {
-                const baseEl = document.querySelector('base');
-                baseEl.href = '/city_comp/';
-            }
+            const baseUrl = isGitHubPages ? '/city_comp' : '';
+            document.write(`<base href="${baseUrl}/">`);
+            document.write(`<link rel="stylesheet" href="${baseUrl}/styles.css">`);
         })();
     </script>
 </head>
@@ -178,6 +175,13 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Handle GitHub Pages script path
+        (function() {
+            const isGitHubPages = window.location.hostname.includes('github.io');
+            const baseUrl = isGitHubPages ? '/city_comp' : '';
+            document.write(`<script src="${baseUrl}/script.js"><\/script>`);
+        })();
+    </script>
 </body>
 </html> 

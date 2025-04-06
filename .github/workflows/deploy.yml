@@ -28,11 +28,24 @@ jobs:
 
       - name: Prepare deployment
         run: |
-          mkdir _site
-          cp -r index.html styles.css script.js package.json README.md _site/
+          # Create deployment directory
+          mkdir -p _site
+          
+          # Copy all necessary files
+          cp index.html _site/
+          cp styles.css _site/
+          cp script.js _site/
+          cp package.json _site/
+          cp README.md _site/
+          
+          # Copy any additional directories if they exist
           if [ -d "images" ]; then
             cp -r images _site/
           fi
+          
+          # Verify files are copied
+          echo "Deployment directory contents:"
+          ls -la _site/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
