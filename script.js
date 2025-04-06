@@ -4,6 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const compareBtn = document.getElementById('compare-btn');
     const city1Data = document.getElementById('city1-data');
     const city2Data = document.getElementById('city2-data');
+    const shareBtn = document.getElementById('share-comparison');
+    const shareModal = document.getElementById('share-modal');
+    const closeShareBtn = document.querySelector('.close-share');
+
+    // Initially disable the share button
+    shareBtn.disabled = true;
+    shareBtn.style.opacity = '0.5';
+    shareBtn.style.cursor = 'not-allowed';
 
     // Settings related elements
     const settingsBtn = document.getElementById('settings-btn');
@@ -17,14 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let useImperial = localStorage.getItem('useImperial') === 'true';
 
     // Apply initial settings
-    if (isDarkMode) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggle.checked = true;
+    function applySettings() {
+        // Apply theme
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+        themeToggle.checked = isDarkMode;
+
+        // Apply units
+        unitToggle.checked = useImperial;
+        const unitLabels = document.querySelectorAll('.unit-label');
+        unitLabels.forEach(label => {
+            label.textContent = useImperial ? 'MI/°F' : 'KM/°C';
+        });
     }
-    if (useImperial) {
-        unitToggle.checked = true;
-        unitToggle.nextElementSibling.nextElementSibling.textContent = 'MI/°F';
-    }
+
+    // Apply initial settings
+    applySettings();
 
     // Initialize the map
     const map = L.map('map-container').setView([0, 0], 2);
@@ -538,6 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.lastCity1Data = city1Info;
         window.lastCity2Data = city2Info;
 
+        // Enable share button
+        shareBtn.disabled = false;
+        shareBtn.style.opacity = '1';
+        shareBtn.style.cursor = 'pointer';
+
         // Clear previous results
         const comparisonResults = document.querySelector('.comparison-results');
         comparisonResults.innerHTML = `
@@ -652,18 +672,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    themeToggle.addEventListener('change', () => {
-        isDarkMode = themeToggle.checked;
+    // Theme toggle handlers
+    function handleThemeToggle(isChecked) {
+        isDarkMode = isChecked;
         document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
         localStorage.setItem('darkMode', isDarkMode);
-    });
+        themeToggle.checked = isDarkMode;
+    }
 
-    unitToggle.addEventListener('change', () => {
-        useImperial = unitToggle.checked;
-        unitToggle.nextElementSibling.nextElementSibling.textContent = useImperial ? 'MI/°F' : 'KM/°C';
+    themeToggle.addEventListener('change', (e) => handleThemeToggle(e.target.checked));
+
+    // Unit toggle handlers
+    function handleUnitToggle(isChecked) {
+        useImperial = isChecked;
+        const unitLabels = document.querySelectorAll('.unit-label');
+        unitLabels.forEach(label => {
+            label.textContent = useImperial ? 'MI/°F' : 'KM/°C';
+        });
         localStorage.setItem('useImperial', useImperial);
+        unitToggle.checked = useImperial;
 
-        // Update any displayed distances and temperatures if they exist
+        // Update any displayed distances and temperatures
         updateDisplayedDistances();
         
         // Update city data displays if they exist
@@ -680,7 +709,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateWeatherComparison(city1Data, city2Data);
             }
         }
-    });
+    }
+
+    unitToggle.addEventListener('change', (e) => handleUnitToggle(e.target.checked));
 
     function updateDisplayedDistances() {
         const distanceInfo = document.querySelector('.distance-info');
@@ -904,5 +935,280 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Trigger the compare button click
         document.getElementById('compare-btn').click();
+    });
+
+    // Tab switching functionality
+    const compareTab = document.getElementById('compare-tab');
+    const topCompsTab = document.getElementById('top-comps-tab');
+    const myCompsTab = document.getElementById('my-comps-tab');
+    const compareContent = document.getElementById('compare-content');
+    const topCompsContent = document.getElementById('top-comps-content');
+    const myCompsContent = document.getElementById('my-comps-content');
+
+    // Verify all elements are found
+    console.log('Tab Elements:', {
+        compareTab,
+        topCompsTab,
+        myCompsTab,
+        compareContent,
+        topCompsContent,
+        myCompsContent
+    });
+
+    function switchTab(activeTab, activeContent) {
+        console.log('Switching to tab:', activeTab.id);
+        
+        // Remove active class from all tabs
+        [compareTab, topCompsTab, myCompsTab].forEach(tab => {
+            if (tab) tab.classList.remove('active');
+        });
+        
+        // Remove active class from all content
+        [compareContent, topCompsContent, myCompsContent].forEach(content => {
+            if (content) content.classList.remove('active');
+        });
+        
+        // Add active class to selected tab and content
+        if (activeTab && activeContent) {
+            activeTab.classList.add('active');
+            activeContent.classList.add('active');
+        }
+    }
+
+    // Add click event listeners to tabs
+    if (compareTab) {
+        compareTab.addEventListener('click', () => {
+            console.log('Compare tab clicked');
+            switchTab(compareTab, compareContent);
+        });
+    }
+
+    if (topCompsTab) {
+        topCompsTab.addEventListener('click', () => {
+            console.log('Top comps tab clicked');
+            switchTab(topCompsTab, topCompsContent);
+            updateTopComps();
+        });
+    }
+
+    if (myCompsTab) {
+        myCompsTab.addEventListener('click', () => {
+            console.log('My comps tab clicked');
+            switchTab(myCompsTab, myCompsContent);
+            updateMyCities();
+        });
+    }
+
+    // Popular comparisons tracking
+    function getStorageKey() {
+        const today = new Date().toISOString().split('T')[0];
+        return `cityComps_${today}`;
+    }
+
+    function trackComparison(city1, city2) {
+        const storageKey = getStorageKey();
+        let comparisons = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        
+        // Sort cities alphabetically to ensure consistent tracking
+        const compKey = [city1, city2].sort().join(' vs ');
+        comparisons[compKey] = (comparisons[compKey] || 0) + 1;
+        
+        localStorage.setItem(storageKey, JSON.stringify(comparisons));
+    }
+
+    function updateTopComps() {
+        const topCompsList = document.querySelector('.top-comps-list');
+        const storageKey = getStorageKey();
+        const comparisons = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        
+        // Sort comparisons by count
+        const sortedComps = Object.entries(comparisons)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10); // Show top 10
+
+        if (sortedComps.length === 0) {
+            topCompsList.innerHTML = '<p class="no-comps">No comparisons made today yet.</p>';
+            return;
+        }
+
+        topCompsList.innerHTML = sortedComps.map(([cities, count]) => `
+            <div class="top-comp-item" data-cities="${cities}">
+                <div class="top-comp-cities">
+                    <span>${cities}</span>
+                </div>
+                <div class="top-comp-count">${count} ${count === 1 ? 'view' : 'views'}</div>
+            </div>
+        `).join('');
+
+        // Add click handlers to comparison items
+        document.querySelectorAll('.top-comp-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const [city1, city2] = item.dataset.cities.split(' vs ');
+                document.getElementById('city1').value = city1;
+                document.getElementById('city2').value = city2;
+                switchTab(compareTab, compareContent);
+                document.getElementById('compare-btn').click();
+            });
+        });
+    }
+
+    // City usage tracking
+    function trackCityUsage(cityName) {
+        const storageKey = 'myCities';
+        let cityStats = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        
+        if (!cityStats[cityName]) {
+            cityStats[cityName] = {
+                count: 0,
+                lastUsed: null
+            };
+        }
+        
+        cityStats[cityName].count++;
+        cityStats[cityName].lastUsed = new Date().toISOString();
+        
+        localStorage.setItem(storageKey, JSON.stringify(cityStats));
+    }
+
+    function updateMyCities() {
+        const myCitiesList = document.querySelector('.my-cities-list');
+        const cityStats = JSON.parse(localStorage.getItem('myCities') || '{}');
+        
+        // Sort cities by usage count and take top 10
+        const sortedCities = Object.entries(cityStats)
+            .sort(([, a], [, b]) => b.count - a.count)
+            .slice(0, 10);
+
+        if (sortedCities.length === 0) {
+            myCitiesList.innerHTML = '<p class="no-comps">No cities compared yet.</p>';
+            return;
+        }
+
+        myCitiesList.innerHTML = sortedCities.map(([city, stats]) => {
+            const lastUsed = new Date(stats.lastUsed).toLocaleDateString();
+            return `
+                <div class="city-stat-item" data-city="${city}">
+                    <div class="city-name">${city}</div>
+                    <div class="city-usage">
+                        <span class="usage-count">${stats.count} ${stats.count === 1 ? 'use' : 'uses'}</span>
+                        <span class="last-used">Last used: ${lastUsed}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click handlers to city items
+        document.querySelectorAll('.city-stat-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const cityName = item.dataset.city;
+                // If city1 is empty or has a value, put the selected city there
+                if (!document.getElementById('city1').value) {
+                    document.getElementById('city1').value = cityName;
+                } else {
+                    document.getElementById('city2').value = cityName;
+                }
+                switchTab(compareTab, compareContent);
+            });
+        });
+    }
+
+    // Update tracking when cities are compared
+    compareBtn.addEventListener('click', async () => {
+        const city1 = city1Input.value.trim();
+        const city2 = city2Input.value.trim();
+        
+        if (city1 && city2) {
+            trackComparison(city1, city2);
+            trackCityUsage(city1);
+            trackCityUsage(city2);
+        }
+        // ... rest of existing comparison logic ...
+    });
+
+    // Share functionality
+    shareBtn.addEventListener('click', () => {
+        const city1 = city1Input.value.trim();
+        const city2 = city2Input.value.trim();
+
+        if (!city1 || !city2) {
+            alert('Please compare two cities first before sharing.');
+            return;
+        }
+
+        // Create share URL with city parameters
+        const shareUrl = new URL(window.location.href);
+        shareUrl.searchParams.set('city1', city1);
+        shareUrl.searchParams.set('city2', city2);
+        
+        // Update modal content for link sharing
+        const modalContent = document.querySelector('.share-modal-content');
+        modalContent.innerHTML = `
+            <button class="close-share">&times;</button>
+            <h3>Share Comparison</h3>
+            <div class="share-url-container">
+                <input type="text" id="share-url" value="${shareUrl.href}" readonly>
+                <button onclick="copyShareUrl()" class="copy-url-btn">Copy Link</button>
+            </div>
+            <div class="share-options">
+                <button onclick="shareToTwitter('${shareUrl.href}')" class="share-option twitter">
+                    Share on X
+                </button>
+            </div>
+        `;
+
+        // Show the modal
+        shareModal.classList.add('active');
+
+        // Reattach event listener to the new close button
+        const newCloseBtn = modalContent.querySelector('.close-share');
+        newCloseBtn.addEventListener('click', () => {
+            shareModal.classList.remove('active');
+        });
+    });
+
+    // Copy URL function
+    window.copyShareUrl = function() {
+        const shareUrl = document.getElementById('share-url');
+        shareUrl.select();
+        document.execCommand('copy');
+        
+        // Show feedback
+        const copyBtn = document.querySelector('.copy-url-btn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+        }, 2000);
+    };
+
+    // Updated social sharing functions
+    window.shareToTwitter = function(url) {
+        const text = `Check out this comparison between ${city1Input.value} and ${city2Input.value}!`;
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        window.open(twitterUrl, '_blank');
+    };
+
+    // Close modal handlers
+    closeShareBtn.addEventListener('click', () => {
+        shareModal.classList.remove('active');
+    });
+
+    shareModal.addEventListener('click', (e) => {
+        if (e.target === shareModal) {
+            shareModal.classList.remove('active');
+        }
+    });
+
+    // Check for shared URL parameters on page load
+    window.addEventListener('load', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sharedCity1 = urlParams.get('city1');
+        const sharedCity2 = urlParams.get('city2');
+        
+        if (sharedCity1 && sharedCity2) {
+            city1Input.value = sharedCity1;
+            city2Input.value = sharedCity2;
+            compareBtn.click();
+        }
     });
 }); 

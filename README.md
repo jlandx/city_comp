@@ -5,6 +5,8 @@ A web application that allows users to compare two cities based on various metri
 - Time zone differences
 - Geographic distance
 - City statistics
+- Weather information
+- Historical growth data
 
 ## Features
 - Interactive city search with autocomplete
@@ -13,14 +15,22 @@ A web application that allows users to compare two cities based on various metri
 - Distance units toggle (KM/Miles)
 - Responsive design
 - Interactive map visualization
+- Share functionality with URL sharing
+- Top comparisons tracking
+- Personal comparison history
+- City locking for random comparisons
+- Multiple tabs for different views
 
 ## Technologies Used
 - HTML5
 - CSS3
 - JavaScript
 - Leaflet.js for mapping
-- City Timezone API
-- Geolocation services
+- OpenStreetMap for geocoding
+- OpenWeatherMap API for weather data
+- TimeZoneDB API for timezone data
+- Wikidata API for population data
+- Local Storage for data persistence
 
 ## Getting Started
 1. Clone the repository
@@ -30,4 +40,17 @@ A web application that allows users to compare two cities based on various metri
 
 ## Settings
 - Toggle dark/light mode via the settings icon
-- Switch between kilometers and miles for distance measurements 
+- Switch between kilometers/miles and Celsius/Fahrenheit
+- Lock cities for random comparison
+
+## Sharing
+- Generate shareable links for city comparisons
+- Share directly to social media
+- Track popular comparisons
+
+## Live Demo
+Visit [https://jakelandgraf.github.io/city_comparison_app/](https://jakelandgraf.github.io/city_comparison_app/) to try the app.
+
+## Version History
+- v2.0.0 - Added sharing, tabs, top comparisons, and personal history
+- v1.0.0 - Initial release with basic comparison functionality 
