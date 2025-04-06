@@ -38,6 +38,17 @@ A web application that allows users to compare two cities based on various metri
 3. Enter two cities to compare
 4. Explore the various comparison metrics
 
+## Development
+- The application uses relative paths for all assets
+- Base URL is configured for GitHub Pages deployment
+- CSS and JavaScript files are in the root directory
+
+## Deployment
+- The app is deployed to GitHub Pages
+- Production URL: https://jlandx.github.io/city_comp/
+- Deployment is automated via GitHub Actions
+- The `main` branch is automatically deployed
+
 ## Settings
 - Toggle dark/light mode via the settings icon
 - Switch between kilometers/miles and Celsius/Fahrenheit
@@ -48,9 +59,14 @@ A web application that allows users to compare two cities based on various metri
 - Share directly to social media
 - Track popular comparisons
 
-## Live Demo
-Visit [https://jakelandgraf.github.io/city_comparison_app/](https://jakelandgraf.github.io/city_comparison_app/) to try the app.
-
 ## Version History
 - v2.0.0 - Added sharing, tabs, top comparisons, and personal history
-- v1.0.0 - Initial release with basic comparison functionality 
+- v1.0.0 - Initial release with basic comparison functionality
+
+## Release Process
+1. Update version number in:
+   - `index.html` (version display)
+   - `package.json` (version field)
+2. Commit changes to `main` branch
+3. GitHub Actions will automatically deploy to GitHub Pages
+4. Verify deployment at https://jlandx.github.io/city_comp/ 
