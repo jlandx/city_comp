@@ -15,11 +15,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: |
+          if [ -f "package.json" ]; then
+            npm install
+          fi
+
+      - name: Prepare deployment
+        run: |
+          mkdir _site
+          cp -r index.html styles.css script.js package.json README.md _site/
+          if [ -d "images" ]; then
+            cp -r images _site/
+          fi
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+          publish_dir: ./_site
           force_orphan: true
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
