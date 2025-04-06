@@ -197,8 +197,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateVisualComparison(city1Data, city2Data) {
-        const circle1 = document.getElementById('city1-circle');
-        const circle2 = document.getElementById('city2-circle');
+        // Get or create the visual comparison container
+        let visualContainer = document.querySelector('.visual-comparison');
+        if (!visualContainer) {
+            visualContainer = document.createElement('div');
+            visualContainer.className = 'visual-comparison';
+            document.getElementById('population-comparison').appendChild(visualContainer);
+        }
+
+        // Get or create circle elements
+        let circle1 = document.getElementById('city1-circle');
+        let circle2 = document.getElementById('city2-circle');
+
+        if (!circle1) {
+            circle1 = document.createElement('div');
+            circle1.id = 'city1-circle';
+            circle1.className = 'city-circle';
+            visualContainer.appendChild(circle1);
+        }
+
+        if (!circle2) {
+            circle2 = document.createElement('div');
+            circle2.id = 'city2-circle';
+            circle2.className = 'city-circle';
+            visualContainer.appendChild(circle2);
+        }
         
         // Get population numbers
         const pop1 = parseInt(city1Data.population.replace(/,/g, '')) || 0;
