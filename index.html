@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Size Comparison</title>
+    <title>City Comps</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>City Size Comparison</h1>
+            <h1>City Comps</h1>
+            <div class="instructions">
+                <p>Enter two city names to compare their size, population, area, weather, and timezone. Use the lock buttons to keep one city while randomizing the other, or click "Random Cities" to compare two random cities.</p>
+            </div>
             <button id="settings-btn" class="settings-btn" aria-label="Settings">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="3"></circle>
@@ -31,40 +34,58 @@
                     </label>
                 </div>
                 <div class="settings-option">
-                    <label for="unit-toggle">Distance Unit</label>
+                    <label for="unit-toggle">Use Imperial Units (Miles/°F)</label>
                     <label class="switch">
                         <input type="checkbox" id="unit-toggle">
                         <span class="slider round"></span>
-                        <span class="unit-label">KM</span>
                     </label>
+                    <span class="unit-label">KM</span>
                 </div>
                 <button id="close-settings" class="close-btn">Close</button>
             </div>
         </div>
 
         <div class="comparison-container">
-            <div class="city-input">
-                <input type="text" id="city1" placeholder="Enter first city">
-                <input type="text" id="city2" placeholder="Enter second city">
-                <button id="compare-btn">Compare Cities</button>
+            <div class="search-section">
+                <div class="search-container">
+                    <div class="input-group">
+                        <input type="text" id="city1" placeholder="Enter first city name">
+                        <button id="lock-city1" class="lock-btn" aria-label="Lock first city">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="city2" placeholder="Enter second city name">
+                        <button id="lock-city2" class="lock-btn" aria-label="Lock second city">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <button id="compare-btn">Compare Cities</button>
+                    <button id="randomize-btn">Random Cities</button>
+                </div>
             </div>
             
+            <!-- Basic city data -->
+            <div class="basic-city-data">
+                <div id="city1-data" class="city-data"></div>
+                <div id="city2-data" class="city-data"></div>
+            </div>
+
             <!-- Map container -->
             <div id="map-container"></div>
 
-            <!-- Visual comparison container -->
-            <div id="visual-comparison" class="visual-comparison">
-                <div class="city-circle" id="city1-circle"></div>
-                <div class="city-circle" id="city2-circle"></div>
-            </div>
+            <!-- Distance info will be inserted here -->
+            <div id="distance-info-container"></div>
 
-            <!-- Detailed comparisons -->
-            <div class="detailed-comparisons">
-                <div class="comparison-card large-card">
-                    <h3>Time Zone</h3>
-                    <div id="timezone-comparison" class="comparison-content"></div>
-                </div>
-
+            <!-- Comparison results -->
+            <div class="comparison-results">
+                <!-- Population and Statistics -->
                 <div class="comparison-card">
                     <h3>Population Comparison</h3>
                     <div id="population-comparison" class="comparison-content"></div>
@@ -74,15 +95,22 @@
                     <h3>City Statistics</h3>
                     <div id="statistics-comparison" class="comparison-content"></div>
                 </div>
-            </div>
 
-            <!-- Basic city data -->
-            <div class="comparison-results">
-                <div id="city1-data" class="city-data"></div>
-                <div id="city2-data" class="city-data"></div>
+                <!-- Weather -->
+                <div class="comparison-card large-card">
+                    <h3>Weather</h3>
+                    <div id="weather-comparison" class="comparison-content"></div>
+                </div>
+
+                <!-- Time Zone -->
+                <div class="comparison-card large-card">
+                    <h3>Time Zone</h3>
+                    <div id="timezone-comparison" class="comparison-content"></div>
+                </div>
             </div>
         </div>
     </div>
+    <div class="version">v1.0.0</div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
 </body>
